@@ -2,32 +2,21 @@
 
 var express = require('express'),
     routes = require('./app/routes/index.js'),
-    mongo = require('mongodb').MongoClient;
+    mongo = require('mongoose');
 
 //var path = require("path");
 
 var app = express();
 
-mongo.connect('mongodb://localhost:27017/clementinejs', function (err, db) {
+mongo.connect('mongodb://localhost:27017/clementinejs');
 
-    if (err) {
-        throw new Error('Database failed to connect!');
-    } else {
-        console.log('MongoDB successfully connected on port 27017.');
-    }
-    
-    
-    //bind reference to public and controllers folders, otherwise images and other items may not be rendered
+ //bind reference to public and controllers folders, otherwise images and other items may not be rendered
     app.use('/public', express.static(process.cwd() + '/public'));
 
     app.use('/controllers', express.static(process.cwd() + '/app/controllers'));
 
-    routes(app, db);
+    routes(app);
 
     app.listen(process.env.PORT, function () {
         console.log('Listening on port ', process.env.PORT);
     });
-
-   
-
-});

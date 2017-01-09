@@ -1,14 +1,16 @@
 'use strict';
 
-var ClickHandler = require(process.cwd() + '/app/controllers/clickHandler.server.js');
+var path = process.cwd();
 
-module.exports = function (app, db) {
+var ClickHandler = require(path + '/app/controllers/clickHandler.server.js');
 
-    var clickHandler = new ClickHandler(db);
+module.exports = function (app) {
+
+    var clickHandler = new ClickHandler();
 
     app.route('/')
         .get(function (req, res) {
-            res.sendFile(process.cwd() + '/public/index.html');
+            res.sendFile(path + '/public/index.html');
         });
 
     app.route('/api/clicks')
@@ -16,13 +18,3 @@ module.exports = function (app, db) {
         .post(clickHandler.addClick)
         .delete(clickHandler.resetClicks);
 };
-
-
-
-/**app.get('/', function (req, res) {
-  //sendFile only works in express 4.8.0+
-    //res.sendFile(path.join(__dirname, 'index.html'));
-    //res.sendFile(__dirname + "/index.html");
-    //res.sendFile('index.html' , { root : __dirname});
-    res.sendFile(process.cwd() + '/index.html');
-});**/
