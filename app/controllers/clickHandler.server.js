@@ -1,55 +1,50 @@
 'use strict';
 
-function clickHandler (db) {
-   var clicks = db.collection('clicks');
+var Clicks = require('../models/clicks.js');
 
+function ClickHandler () {
    this.getClicks = function (req, res) {
+    Clicks
+        .findOne({}, { '_id': false })
+        .exec(function (err, result) {
+                if (err) { throw err; }
 
-      var clickProjection = { '_id': false };
+                if (result) {
+                    res.json(result);
+                } else {
+                    var newDoc = new Clicks({ 'clicks': 0 });
+                    newDoc.save(function (err, doc) {
+                        if (err) { throw err; }
 
-      clicks.findOne({}, clickProjection, function (err, result) {
-         if (err) {
-            throw err;
-         }
+                        res.json(doc);
+                    });
 
-         if (result) {
-             console.log(result);
-            res.json(result);
-         } else {
-            clicks.insert({ 'clicks': 0 }, function (err) {
-               if (err) {
-                  throw err;
-               }
-
-               clicks.findOne({}, clickProjection, function (err, doc) {
-                  if (err) {
-                     throw err;
-                  }
-                  res.json(doc);
-               });
+                }
             });
-         }
-      });
-   };
+};
 
-   this.addClick = function (req, res) {
-      clicks.findAndModify({}, { '_id': 1 }, { $inc: { 'clicks': 1 }}, function (err, result) {
-         if (err) {
-            throw err;
-         }
+this.addClick = function (req, res) {
+    Clicks
+        .findOneAndUpdate({}, { $inc: { 'clicks': 1 } })
+        .exec(function (err, result) {
+                if (err) { throw err; }
 
-         res.json(result);
-      });
-   };
+                res.json(result);
+            }
+        );
+};
 
-   this.resetClicks = function (req, res) {
-      clicks.update({}, { 'clicks': 0 }, function (err, result) {
-         if (err) {
-            throw err;
-         }
-         res.json(result);
-      });
-   };
+this.resetClicks = function (req, res) {
+    Clicks
+        .findOneAndUpdate({}, { 'clicks': 0 })
+        .exec(function (err, result) {
+                if (err) { throw err; }
+
+                res.json(result);
+            }
+        );
+};
+
 }
 
-module.exports = clickHandler;
+module.exports = ClickHandler;
